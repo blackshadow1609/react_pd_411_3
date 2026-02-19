@@ -9,16 +9,45 @@ class Main extends React.Component {
         movies: [],
         count: 0
     }
+    
     componentDidMount() {
         fetch('https://www.omdbapi.com/?apikey=ea2ec2e3&s=Coraline')
             .then(response => response.json())
-            .then(data => this.setState({ movies: data.Search }));
+            .then(data => {
+                if (data.Search && Array.isArray(data.Search)) {
+                    const uniqueMovies = this.removeDuplicates(data.Search);
+                    this.setState({ movies: uniqueMovies });
+                }
+            });
     }
+    
+    // Что бы не фильмов с одинаковым imdbID--------------------------------------
+    removeDuplicates = (moviesArray) => {
+        const uniqueIds = {};
+        
+        return moviesArray.filter(movie => {
+            if (!uniqueIds[movie.imdbID]) {
+                uniqueIds[movie.imdbID] = true;
+                return true;
+            }
+            return false;
+        });
+    }
+    // ----------------------------------------------------------------------------
+    
     searchMovie = (str, type = 'all', page = 1) => {
         fetch(`https://www.omdbapi.com/?apikey=ea2ec2e3&s=${str}${type !== 'all' ? `&type=${type}` : ''}${`&page=${page}`}`)
             .then(response => response.json())
-            .then(data => this.setState({ movies: data.Search }));
+            .then(data => {
+                if (data.Search && Array.isArray(data.Search)) {
+                    const uniqueMovies = this.removeDuplicates(data.Search);
+                    this.setState({ movies: uniqueMovies });
+                } else {
+                    this.setState({ movies: [] });
+                }
+            });
     }
+    
     render() {
         return (
             <div className='main'>
@@ -30,4 +59,5 @@ class Main extends React.Component {
         )
     }
 }
+
 export default Main;
