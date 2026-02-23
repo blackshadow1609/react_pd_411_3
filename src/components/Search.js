@@ -19,6 +19,12 @@ class Search extends React.Component {
             () => { this.props.searchMovie(this.state.search, this.state.type, this.state.page) }
         )
     }
+    setPage = (num) => {
+        this.setState(
+            () => ({ page: num }),
+            () => (this.props.searchMovie(this.state.search, this.state.type, this.state.page))
+        )
+    }
     handleKey = (event) => {
         if (event.key === 'Enter') {
             this.props.searchMovie(this.state.search, this.state.type);
@@ -32,6 +38,11 @@ class Search extends React.Component {
         let totalPages = Math.ceil(this.props.totalCount / limit);
         const lastIndex = totalPages <= 10 ? totalPages + 1 : this.state.page + limit;
         const firstIndex = totalPages <= 10 ? lastIndex - limit + lastIndex + 1 : lastIndex - limit;
+        let num = [];
+        for (let i = 0; i < totalPages; i++) {
+            num.push(i);
+        }
+
         return (
             <>
                 <div className='search'>
@@ -51,7 +62,7 @@ class Search extends React.Component {
                             data-type="all"
                             checked={this.state.type == 'all'}
                             onChange={this.handleFilter} />
-                        <label for='all'>All</label>
+                        <label htmlFor='all'>All</label>
                     </div>
 
                     <div>
@@ -61,7 +72,7 @@ class Search extends React.Component {
                             data-type="movie"
                             checked={this.state.type == 'movie'}
                             onChange={this.handleFilter} />
-                        <label for='movie'>Movie</label>
+                        <label htmlFor='movie'>Movie</label>
                     </div>
 
                     <div>
@@ -70,7 +81,7 @@ class Search extends React.Component {
                             data-type="series"
                             checked={this.state.type == 'series'}
                             onChange={this.handleFilter} />
-                        <label for='series'>Series</label>
+                        <label htmlFor='series'>Series</label>
                     </div>
 
                     <div>
@@ -80,12 +91,28 @@ class Search extends React.Component {
                             data-type="game"
                             checked={this.state.type == 'game'}
                             onChange={this.handleFilter} />
-                        <label for='game'>Game</label>
+                        <label htmlFor='game'>Game</label>
                     </div>
                 </div>
 
                 <div className='navigator'>
                     <button className='btn' onClick={this.prevPage}>Prev</button>
+                    <div className='items'>
+                        {
+                            num.slice(firstIndex, lastIndex)
+                                .map
+                                (
+                                    (element, index) => (
+                                        <button
+                                            className='btn'
+                                            style={{ background: this.state.page != element ? "gray" : "" }}
+                                            key={index}
+                                            onClick={() => (this.setPage(element))}
+                                        >{element}</button>
+                                    )
+                                )
+                        }
+                    </div>
                     <button className='btn' onClick={this.nextPage}>Next</button>
                 </div>
             </>

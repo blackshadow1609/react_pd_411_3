@@ -9,22 +9,17 @@ class Main extends React.Component {
         movies: [],
         count: 0
     }
-    
+
     componentDidMount() {
         fetch('https://www.omdbapi.com/?apikey=ea2ec2e3&s=Coraline')
             .then(response => response.json())
-            .then(data => {
-                if (data.Search && Array.isArray(data.Search)) {
-                    const uniqueMovies = this.removeDuplicates(data.Search);
-                    this.setState({ movies: uniqueMovies });
-                }
-            });
+            .then(data => this.setState({ movies: data.Search, count: data.totalResult }));
     }
-    
-    // Что бы не фильмов с одинаковым imdbID--------------------------------------
+
+    // Что бы не было фильмов с одинаковым imdbID--------------------------------------
     removeDuplicates = (moviesArray) => {
         const uniqueIds = {};
-        
+
         return moviesArray.filter(movie => {
             if (!uniqueIds[movie.imdbID]) {
                 uniqueIds[movie.imdbID] = true;
@@ -33,21 +28,14 @@ class Main extends React.Component {
             return false;
         });
     }
-    // ----------------------------------------------------------------------------
-    
+    // --------------------------------------------------------------------------------
+
     searchMovie = (str, type = 'all', page = 1) => {
         fetch(`https://www.omdbapi.com/?apikey=ea2ec2e3&s=${str}${type !== 'all' ? `&type=${type}` : ''}${`&page=${page}`}`)
             .then(response => response.json())
-            .then(data => {
-                if (data.Search && Array.isArray(data.Search)) {
-                    const uniqueMovies = this.removeDuplicates(data.Search);
-                    this.setState({ movies: uniqueMovies });
-                } else {
-                    this.setState({ movies: [] });
-                }
-            });
+            .then(data => this.setState({ movies: data.Search, count: data.totalResult }));
     }
-    
+
     render() {
         return (
             <div className='main'>
